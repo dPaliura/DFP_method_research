@@ -105,7 +105,31 @@ pie(c(stp_grd_inv, stp_grd_unc, stp_grd_cor, stp_grd_cor, stp_grd_unc, stp_grd_i
     labels = c("norm invalid", "norm uncorrect", "norm correct", 
                "grad correct", "grad uncorrect", "grad invalid"),
     col=c("red", "yellow", "green", "green", "yellow", "red"))
-# So it does't matter wich criteria to choos
+# So it does't matter wich criteria to choose
+
+# Last what we need to visualise of binary parameters is restart prescence
+rst_T_inv <- sum(DS_inv$restarts.presence)/N
+rst_F_inv <- sum(!DS_inv$restarts.presence)/N
+rst_T_unc <- sum(DS_unc$restarts.presence)/N
+rst_F_unc <- sum(!DS_unc$restarts.presence)/N
+rst_T_cor <- sum(DS_cor$restarts.presence)/N
+rst_F_cor <- sum(!DS_cor$restarts.presence)/N
+pie(c(rst_T_inv, rst_T_unc, rst_T_cor, rst_F_cor, rst_F_unc, rst_F_inv),
+    labels = c("invalid with restarts", "uncorrect with restarts", "correct with restarts", 
+               "correct without restarts", "uncorrect without restarts", "invalid without restarts"),
+    col=c("red", "yellow", "green", "green", "yellow", "red"))
+# Somewhy algorithm is less times runned without restarts, but even so we can see 
+# that when restarts present it is less faults.
+
+# But still there is question: the percen of correct records?
+# Answer for presece of restarts
+rst_T_cor/(rst_T_cor+rst_T_unc+rst_T_inv) *100
+# And for absence of them
+rst_F_cor/(rst_F_cor+rst_F_unc+rst_F_inv) *100
+# So almost 35% percents in both cases
+# In fact there is new question appears: 
+# What is better - to have greater uncorrectness and greater stability
+# or vice versa - less uncorrectness and less stability?
 
 # And last: how DFP method accuracy affects on correctnes density?
 hist(log10(DS_inv$accuracy))
@@ -164,10 +188,13 @@ N_best/N *100
 # - Gold Ratio method gives uncorrect values very often (about 7 per 9 times),
 #   in other hand DSK-Powell method more then in half times returns correct result
 #   and uncorrect values met as freequent as invalid. So usage od DSK-P is more valuable
-# - It is no difference between usage of both criterias
+# - It is no difference between usage of both stop criterias
+# - Presence of restarts a little more stable then absence of them: equal correctness
+#   with less failures 
 # - The most correct values returned when DFP accuracy is 1e-3 and greater
 #
 # --- In case when only viewed parameters wich occurs the most correctness ---
+#
 # - This cases twice more correct indeed: 76.6% of correctness 
 #   when in general sample it is only 35%
 # - This cases occurs 18.5% of correct values in general sample
