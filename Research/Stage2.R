@@ -134,8 +134,7 @@ rst_F_cor/(rst_F_cor+rst_F_unc+rst_F_inv) *100
 # And last: how DFP method accuracy affects on correctnes density?
 hist(log10(DS_inv$accuracy))
 hist(log10(DS_unc$accuracy))
-# Again, accuracy grows causes small invalidance grows 
-# and uncorrectness decrease
+# Again, accuracy grows causes small invalidance grows # and uncorrectness decrease
 hist(log10(DS_cor$accuracy))
 # But summary correctness only increases with increasing of method accuracy
 # But the most valuable accuracy as we can see is 1e-3.
@@ -160,12 +159,16 @@ DS_best_unc <- DS_best_val[DS_best_val$accuracy < DS_best_val$reached.accuracy,]
 DS_best_cor <- DS_best_val[DS_best_val$accuracy >= DS_best_val$reached.accuracy,]
 N_best_unc <- nrow(DS_best_unc)
 N_best_unc/N_best *100
-# 7.32% is much less then 45.4% and it is pretty interesting
+# 7.32% of uncorrect records - it is much less then 45.4% and it is pretty interesting
 
 # And so what the percentage of correct values&
 N_best_cor <- nrow(DS_best_cor)
 N_best_cor/N_best *100
 # 76.6% is MUCH more then 35% as in general sample
+
+# It is interesting how valuable can be mistake
+max(DS_best_val$reached.accuracy)
+# It is great deviation, so we need to find out what causes it
 
 # what the percentage of correct values in this cases from general number
 # of correct values
@@ -175,6 +178,97 @@ N_best_cor/N_cor *100
 N_best/N *100
 # only 8.45% cases from general sample occupy 18.5% of all correct records
 # It's really nice.
+
+# And last of this part is checking for changes of binary 
+# parameters (excluding ODS method)
+# First will be serivative method
+der_Oh2_inv <- sum(as.character(DS_best_inv$derivative.method)=="O(h^2)")/N_best
+der_Oh4_inv <- sum(as.character(DS_best_inv$derivative.method)=="O(h^4)")/N_best
+der_Oh2_unc <- sum(as.character(DS_best_unc$derivative.method)=="O(h^2)")/N_best
+der_Oh4_unc <- sum(as.character(DS_best_unc$derivative.method)=="O(h^4)")/N_best
+der_Oh2_cor <- sum(as.character(DS_best_cor$derivative.method)=="O(h^2)")/N_best
+der_Oh4_cor <- sum(as.character(DS_best_cor$derivative.method)=="O(h^4)")/N_best
+pie(c(der_Oh2_inv, der_Oh2_unc, der_Oh2_cor, der_Oh4_cor, der_Oh4_unc, der_Oh4_inv),
+    labels = c("O(h^2) invalid", "O(h^2) uncorrect", "O(h^2) correct", 
+               "O(h^4) correct", "O(h^4) uncorrect", "O(h^4) invalid"),
+    col=c("red", "yellow", "green", "green", "yellow", "red"))
+# We see that correctness is similar, but in case of smaller power of 
+# accuracy there are less uncorrect values and more faults, so it is more
+# stable due to we has less probability to be uninformed about uncorrect result.
+
+# In this case it is interesting to know how big could be mistake for each method
+max(DS_best_val[as.character(DS_best_val$derivative.method)=="O(h^2)",]$reached.accuracy)
+# It is much less but still to big
+
+# Second - stop criteria
+stp_nrm_inv <- sum(as.character(DS_best_inv$criteria.of.stop)=="norm")/N_best
+stp_grd_inv <- sum(as.character(DS_best_inv$criteria.of.stop)=="grad")/N_best
+stp_nrm_unc <- sum(as.character(DS_best_unc$criteria.of.stop)=="norm")/N_best
+stp_grd_unc <- sum(as.character(DS_best_unc$criteria.of.stop)=="grad")/N_best
+stp_nrm_cor <- sum(as.character(DS_best_cor$criteria.of.stop)=="norm")/N_best
+stp_grd_cor <- sum(as.character(DS_best_cor$criteria.of.stop)=="grad")/N_best
+pie(c(stp_grd_inv, stp_grd_unc, stp_grd_cor, stp_grd_cor, stp_grd_unc, stp_grd_inv),
+    labels = c("norm invalid", "norm uncorrect", "norm correct", 
+               "grad correct", "grad uncorrect", "grad invalid"),
+    col=c("red", "yellow", "green", "green", "yellow", "red"))
+# No difference between factors.
+
+# And third is presence of restarts
+rst_T_inv <- sum(DS_best_inv$restarts.presence)/N_best
+rst_F_inv <- sum(!DS_best_inv$restarts.presence)/N_best
+rst_T_unc <- sum(DS_best_unc$restarts.presence)/N_best
+rst_F_unc <- sum(!DS_best_unc$restarts.presence)/N_best
+rst_T_cor <- sum(DS_best_cor$restarts.presence)/N_best
+rst_F_cor <- sum(!DS_best_cor$restarts.presence)/N_best
+pie(c(rst_T_inv, rst_T_unc, rst_T_cor, rst_F_cor, rst_F_unc, rst_F_inv),
+    labels = c("invalid with restarts", "uncorrect with restarts", "correct with restarts", 
+               "correct without restarts", "uncorrect without restarts", "invalid without restarts"),
+    col=c("red", "yellow", "green", "green", "yellow", "red"))
+# Obviously it is more correct result when restarts are present, but 
+# it is interesting what the percent of uncorrect records in each case
+
+# Percent of uncorrect records when restarts are present
+rst_T_unc/(rst_T_unc+rst_T_inv+rst_T_cor) *100
+# And percent of uncorrect recorts when restarts are absent
+rst_F_unc/(rst_F_unc+rst_F_inv+rst_F_cor) *100
+# Nice, it is more frequent uncorrect results when restarts are absent
+# But I can't stop on this!
+
+# We will check the probability to get uncorrect result!
+# When restarts are present
+rst_T_unc/rst_T_cor *100
+# When restarts are absent
+rst_F_unc/rst_F_cor *100
+# Twice more probability to get mistake when restarts are present
+
+# Let's try ro exclude derivative method with O(h^4) accuracy
+DS_better <- DS_best[as.character(DS_best$derivative.method)=="O(h^2)",]
+DS_better_inv <- DS_better[is.na(DS_better$x..1),]
+DS_better_val <- DS_better[!is.na(DS_better$x..1),]
+DS_better_unc <- DS_better_val[DS_better_val$accuracy < DS_better_val$reached.accuracy,]
+DS_better_cor <- DS_better_val[DS_better_val$accuracy >= DS_better_val$reached.accuracy,]
+N_better <- nrow(DS_better)
+# And then look for changes...
+
+# How pie for presence of restarts looks now?
+rst_T_inv <- sum(DS_better_inv$restarts.presence)/N_better
+rst_F_inv <- sum(!DS_better_inv$restarts.presence)/N_better
+rst_T_unc <- sum(DS_better_unc$restarts.presence)/N_better
+rst_F_unc <- sum(!DS_better_unc$restarts.presence)/N_better
+rst_T_cor <- sum(DS_better_cor$restarts.presence)/N_better
+rst_F_cor <- sum(!DS_better_cor$restarts.presence)/N_better
+pie(c(rst_T_inv, rst_T_unc, rst_T_cor, rst_F_cor, rst_F_unc, rst_F_inv),
+    labels = c("invalid with restarts", "uncorrect with restarts", "correct with restarts", 
+               "correct without restarts", "uncorrect without restarts", "invalid without restarts"),
+    col=c("red", "yellow", "green", "green", "yellow", "red"))
+# It looks much better. We shall look on the new percentages
+
+# Probabilities to make mistake
+# When restarts are present
+rst_T_unc/rst_T_cor *100
+# When restarts are absent
+rst_F_unc/rst_F_cor *100
+
 
 # SUMMARY OF PART 1
 #
@@ -200,8 +294,17 @@ N_best/N *100
 # - This cases occurs 18.5% of correct values in general sample
 # - In additional it is only 8.45% of general saple
 # - It is really valuable to use such cases to exclude uncorrectnes and faults
-
+# - Derivative method with O(h^4) accuracy degree causes mistakes more frequently
+#   and it can be excluded
+# - Stop criteria has no influence on method in this case
+# - Prescence of restarts causes correct results much frequent then its' absence
+# - Absence of restarts has less probability to cause mistake
+# - If derivative method with O(h^4) accuracy degree is excluded, then 
+#   presence of restarts has 5.1% of probabily to make mistake, when its' absence
+#   has 4% of such probability otherwise when restarts absent it is tree times
+#   more probable to get invalid result.
 
 
 ######    PART 2
 
+#
