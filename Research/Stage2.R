@@ -307,4 +307,765 @@ rst_F_unc/rst_F_cor *100
 
 ######    PART 2
 
+# There we will build some simple plots, wich have to demonstrate dependencies
+# between different parameters and numbers of calls in plain way
+
+# We have mad ejection, so we need to delete it
+max(DS$calls.number)
+DS <- DS[DS$calls.number<1e9,]
+DS_inv <- DS_inv[DS_inv$calls.number<1e9,]
+max(DS$calls.number)
+# Now it is normal
+
+# First will be plot for all records
+# Dependance from derivative step
+{
+der_steps <- sort(unique(DS$derivative.step))
+log_steps <- log10(der_steps)
+# Tendencies for invalid records
+medns_inv <- NULL # medians for invalid dataset
+means_inv <- NULL # averages for invalid dataset
+sdevs_inv <- NULL # standard deviations for invalid dataset
+# Tendencies for incorrect records
+medns_unc <- NULL # medians for incorrect dataset
+means_unc <- NULL # averages for incorrect dataset
+sdevs_unc <- NULL # standard deviations for incorrect dataset
+# Tendencies for correct records
+medns_cor <- NULL # medians for correct dataset
+means_cor <- NULL # averages for correct dataset
+sdevs_cor <- NULL # standard deviations for correct dataset
+# Filling tendencies
+for (stp in der_steps){
+  subsmpl_inv <- DS_inv$calls.number[DS_inv$derivative.step==stp]
+  subsmpl_unc <- DS_unc$calls.number[DS_unc$derivative.step==stp]
+  subsmpl_cor <- DS_cor$calls.number[DS_cor$derivative.step==stp]
+
+  medns_inv <- c(medns_inv, median(subsmpl_inv))
+  means_inv <- c(means_inv, mean(subsmpl_inv))
+  sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+
+  medns_unc <- c(medns_unc, median(subsmpl_unc))
+  means_unc <- c(means_unc, mean(subsmpl_unc))
+  sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+
+  medns_cor <- c(medns_cor, median(subsmpl_cor))
+  means_cor <- c(means_cor, mean(subsmpl_cor))
+  sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+}
+plot(log10(DS$derivative.step), DS$calls.number, 
+     xlab="power of derivative step", 
+     ylab="number of calls",
+     cex=0.4)
+
+lines(log_steps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+lines(log_steps, means_inv, type='b', pch=19, col="red")
+lines(log_steps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+
+lines(log_steps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+lines(log_steps, means_unc, type='b', pch=19, col="yellow")
+lines(log_steps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+
+lines(log_steps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+lines(log_steps, means_cor, type='b', pch=19, col="green")
+lines(log_steps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+# On this plot we see numbers of call dependence of derivative step powers.
+# Tendencies for numbers of calls are highlighted:
+# - medians are rhombus pointed and linked with dashed lines
+# - averages are bold pointed and linked with solid lines
+# - one standard deviation over average values is represented with dotted lines
+# Colours accordance:
+# - Red     - faults
+# - Yellow  - when uncorrect values got
+# - Green   - when correct values got
+
+# As it is hard to understand all details we will scale it to 10000
+{
+  der_steps <- sort(unique(DS1$derivative.step))
+  log_steps <- log10(der_steps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (stp in der_steps){
+    subsmpl_inv <- DS1_inv$calls.number[DS1_inv$derivative.step==stp]
+    subsmpl_unc <- DS1_unc$calls.number[DS1_unc$derivative.step==stp]
+    subsmpl_cor <- DS1_cor$calls.number[DS1_cor$derivative.step==stp]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS1$derivative.step), DS1$calls.number, 
+       xlab="power of derivative step", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 10000))
+  
+  lines(log_steps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_steps, means_inv, type='b', pch=19, col="red")
+  lines(log_steps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_steps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_steps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_steps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_steps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_steps, means_cor, type='b', pch=19, col="green")
+  lines(log_steps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+# There is no patterns seen 
+
+
+# Then we will look on analogue with ODS accuracy 
+# instead of derivative accuracy
+{
+  ods_eps <- sort(unique(DS1$onedim.accuracy))
+  log_eps <- log10(ods_eps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (eps in ods_eps){
+    subsmpl_inv <- DS1_inv$calls.number[DS1_inv$onedim.accuracy==eps]
+    subsmpl_unc <- DS1_unc$calls.number[DS1_unc$onedim.accuracy==eps]
+    subsmpl_cor <- DS1_cor$calls.number[DS1_cor$onedim.accuracy==eps]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS1$onedim.accuracy), DS1$calls.number, 
+       xlab="power of ODS accuracy", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 10000))
+  
+  lines(log_eps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_eps, means_inv, type='b', pch=19, col="red")
+  lines(log_eps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_eps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_eps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_eps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_eps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_eps, means_cor, type='b', pch=19, col="green")
+  lines(log_eps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+# There is grows of calls with increasing accuracy for halting records
+# Also decreaseing of calls number for correct values
+
+
+# Next will be dependance of Sven method parameter alpha
+{
+  alphas <- sort(unique(DS1$alpha.in.Sven))
+  log_alph <- log10(alphas)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (alph in alphas){
+    subsmpl_inv <- DS1_inv$calls.number[DS1_inv$alpha.in.Sven==alph]
+    subsmpl_unc <- DS1_unc$calls.number[DS1_unc$alpha.in.Sven==alph]
+    subsmpl_cor <- DS1_cor$calls.number[DS1_cor$alpha.in.Sven==alph]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS1$alpha.in.Sven), DS1$calls.number, 
+       xlab="power of alpha parameter in Sven method", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 10000))
+  
+  lines(log_alph, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_alph, means_inv, type='b', pch=19, col="red")
+  lines(log_alph, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_alph, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_alph, means_unc, type='b', pch=19, col="yellow")
+  lines(log_alph, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_alph, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_alph, means_cor, type='b', pch=19, col="green")
+  lines(log_alph, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+# Decreasing of alpha parameter power causes decreasing of numbers of calls
+
+
+# And what about method accuracy?
+{
+  accuracies <- sort(unique(DS1$accuracy))
+  log_eps <- log10(accuracies)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (eps in accuracies){
+    subsmpl_inv <- DS1_inv$calls.number[DS1_inv$accuracy==eps]
+    subsmpl_unc <- DS1_unc$calls.number[DS1_unc$accuracy==eps]
+    subsmpl_cor <- DS1_cor$calls.number[DS1_cor$accuracy==eps]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS1$accuracy), DS1$calls.number, 
+       xlab="power of accuracy", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 10000))
+  
+  lines(log_eps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_eps, means_inv, type='b', pch=19, col="red")
+  lines(log_eps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_eps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_eps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_eps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_eps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_eps, means_cor, type='b', pch=19, col="green")
+  lines(log_eps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+# Nothing interesting found
+
+
+# After that we will look for boxplots on binary parameters
+# in this cases we will exclude invalid cases due to its' superfluity.
+# We has already found that failures causes big numbers of calls
+
+# First binary parameter will be derivative method
+boxplot(DS_cor[as.character(DS_cor$derivative.method)=='O(h^2)',]$calls.number,
+        DS_cor[as.character(DS_cor$derivative.method)=='O(h^4)',]$calls.number,
+        DS_cor[as.character(DS_unc$derivative.method)=='O(h^2)',]$calls.number,
+        DS_cor[as.character(DS_unc$derivative.method)=='O(h^4)',]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct O(h^2)", "correct O(h^4)", 
+                "incorrect O(h^2)", "incorrect O(h^4)"))
+# There is much difference when correct values calculated
+# According to this boxplots it is much more efficient to use more accurate 
+# method, because it causes much less number of iterations - less then 8000 in 
+# 75% of cases, when O(h^2) need not more than 18000 calls in 75% of cases.
+# And it is no difference between usage of methods when got value is uncorrect
+
+############################### ODS boxlots
+boxplot(DS_cor[as.character(DS_cor$onedim.method)=='GR',]$calls.number,
+        DS_cor[as.character(DS_cor$onedim.method)=='DSK-P',]$calls.number,
+        DS_cor[as.character(DS_unc$onedim.method)=='GR',]$calls.number,
+        DS_cor[as.character(DS_unc$onedim.method)=='DSK-P',]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct GR", "correct DSK-P", 
+                "incorrect GR", "incorrect DSK-P"))
+##################################
+
+################################# Stop criteria boxplots
+boxplot(DS_cor[as.character(DS_cor$criteria.of.stop)=='norm',]$calls.number,
+        DS_cor[as.character(DS_cor$criteria.of.stop)=='grad',]$calls.number,
+        DS_cor[as.character(DS_unc$criteria.of.stop)=='norm',]$calls.number,
+        DS_cor[as.character(DS_unc$criteria.of.stop)=='grad',]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct NORM", "correct GRAD", 
+                "incorrect NORM", "incorrect GRAD"))
+#######################################
+
+####################################### Restarts presence
+boxplot(DS_cor[!DS_cor$restarts.presence,]$calls.number,
+        DS_cor[DS_cor$restarts.presence,]$calls.number,
+        DS_cor[!DS_unc$restarts.presence,]$calls.number,
+        DS_cor[DS_unc$restarts.presence,]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct without\nrestarts", "correct with\nrestarts", 
+                "incorrect without\nrestarts", "incorrect with\nrestarts"))
+########################################
+
+
+
+
+
+
+
+
+
+#########################################################################
+############~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##############
+#########<     All the same analysis for filtered sample     >###########
+############~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~##############
+#########################################################################
+
+
+
+
+
+# We have mad ejection, so we need to delete it
+max(DS_best$calls.number)
+# It is already normal
 #
+#
+###########################################################
+# Derivative step - scale from 0 to 300000
+{
+  der_steps <- sort(unique(DS_best$derivative.step))
+  log_steps <- log10(der_steps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (stp in der_steps){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$derivative.step==stp]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$derivative.step==stp]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$derivative.step==stp]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$derivative.step), DS_best$calls.number, 
+       xlab="power of derivative step", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 300000))
+  
+  lines(log_steps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_steps, means_inv, type='b', pch=19, col="red")
+  lines(log_steps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_steps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_steps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_steps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_steps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_steps, means_cor, type='b', pch=19, col="green")
+  lines(log_steps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+###########################################################
+# Derivative step - scale from 0 to 25000
+{
+  der_steps <- sort(unique(DS_best$derivative.step))
+  log_steps <- log10(der_steps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (stp in der_steps){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$derivative.step==stp]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$derivative.step==stp]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$derivative.step==stp]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$derivative.step), DS_best$calls.number, 
+       xlab="power of derivative step", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 25000))
+  
+  lines(log_steps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_steps, means_inv, type='b', pch=19, col="red")
+  lines(log_steps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_steps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_steps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_steps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_steps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_steps, means_cor, type='b', pch=19, col="green")
+  lines(log_steps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+###########################################################
+# ODS accuracy - scale from 0 to 150000
+{
+  ods_eps <- sort(unique(DS_best$onedim.accuracy))
+  log_eps <- log10(ods_eps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (eps in ods_eps){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$onedim.accuracy==eps]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$onedim.accuracy==eps]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$onedim.accuracy==eps]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$onedim.accuracy), DS_best$calls.number, 
+       xlab="power of ODS accuracy", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 150000))
+  
+  lines(log_eps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_eps, means_inv, type='b', pch=19, col="red")
+  lines(log_eps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_eps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_eps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_eps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_eps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_eps, means_cor, type='b', pch=19, col="green")
+  lines(log_eps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+###########################################################
+# ODS accuracy - scale from 0 to 20000
+{
+  ods_eps <- sort(unique(DS_best$onedim.accuracy))
+  log_eps <- log10(ods_eps)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (eps in ods_eps){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$onedim.accuracy==eps]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$onedim.accuracy==eps]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$onedim.accuracy==eps]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$onedim.accuracy), DS_best$calls.number, 
+       xlab="power of ODS accuracy", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 20000))
+  
+  lines(log_eps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_eps, means_inv, type='b', pch=19, col="red")
+  lines(log_eps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_eps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_eps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_eps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_eps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_eps, means_cor, type='b', pch=19, col="green")
+  lines(log_eps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+###########################################################
+# Sven alpha - scale from 0 to 15000
+{
+  alphas <- sort(unique(DS_best$alpha.in.Sven))
+  log_alph <- log10(alphas)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (alph in alphas){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$alpha.in.Sven==alph]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$alpha.in.Sven==alph]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$alpha.in.Sven==alph]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$alpha.in.Sven), DS_best$calls.number, 
+       xlab="power of alpha parameter in Sven method", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 15000))
+  
+  lines(log_alph, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_alph, means_inv, type='b', pch=19, col="red")
+  lines(log_alph, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_alph, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_alph, means_unc, type='b', pch=19, col="yellow")
+  lines(log_alph, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_alph, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_alph, means_cor, type='b', pch=19, col="green")
+  lines(log_alph, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+###########################################################
+# DFP method accuracy - scale from 0 to 18000
+{
+  accuracies <- sort(unique(DS_best$accuracy))
+  log_eps <- log10(accuracies)
+  # Tendencies for invalid records
+  medns_inv <- NULL # medians for invalid dataset
+  means_inv <- NULL # averages for invalid dataset
+  sdevs_inv <- NULL # standard deviations for invalid dataset
+  # Tendencies for incorrect records
+  medns_unc <- NULL # medians for incorrect dataset
+  means_unc <- NULL # averages for incorrect dataset
+  sdevs_unc <- NULL # standard deviations for incorrect dataset
+  # Tendencies for correct records
+  medns_cor <- NULL # medians for correct dataset
+  means_cor <- NULL # averages for correct dataset
+  sdevs_cor <- NULL # standard deviations for correct dataset
+  # Filling tendencies
+  for (eps in accuracies){
+    subsmpl_inv <- DS_best_inv$calls.number[DS_best_inv$accuracy==eps]
+    subsmpl_unc <- DS_best_unc$calls.number[DS_best_unc$accuracy==eps]
+    subsmpl_cor <- DS_best_cor$calls.number[DS_best_cor$accuracy==eps]
+    
+    medns_inv <- c(medns_inv, median(subsmpl_inv))
+    means_inv <- c(means_inv, mean(subsmpl_inv))
+    sdevs_inv <- c(sdevs_inv, sd(subsmpl_inv))
+    
+    medns_unc <- c(medns_unc, median(subsmpl_unc))
+    means_unc <- c(means_unc, mean(subsmpl_unc))
+    sdevs_unc <- c(sdevs_unc, sd(subsmpl_unc))
+    
+    medns_cor <- c(medns_cor, median(subsmpl_cor))
+    means_cor <- c(means_cor, mean(subsmpl_cor))
+    sdevs_cor <- c(sdevs_cor, sd(subsmpl_cor))
+  }
+  plot(log10(DS_best$accuracy), DS_best$calls.number, 
+       xlab="power of accuracy", 
+       ylab="number of calls",
+       cex=0.4,
+       ylim=c(0, 17000))
+  
+  lines(log_eps, medns_inv, type='b', lty="longdash", pch=23, col="red")
+  lines(log_eps, means_inv, type='b', pch=19, col="red")
+  lines(log_eps, means_inv+sdevs_inv, type='l', lty="dotted", col="red")
+  
+  lines(log_eps, medns_unc, type='b', lty="longdash", pch=23, col="yellow")
+  lines(log_eps, means_unc, type='b', pch=19, col="yellow")
+  lines(log_eps, means_unc+sdevs_unc, type='l', lty="dotted", col="yellow")
+  
+  lines(log_eps, medns_cor, type='b', lty="longdash", pch=23, col="green")
+  lines(log_eps, means_cor, type='b', pch=19, col="green")
+  lines(log_eps, means_cor+sdevs_cor, type='l', lty="dotted", col="green")
+}
+###########################################################
+#
+#
+#
+#
+#----------------------------------------------------------
+# Derivative method
+boxplot(DS_cor[as.character(DS_cor$derivative.method)=='O(h^2)',]$calls.number,
+        DS_cor[as.character(DS_cor$derivative.method)=='O(h^4)',]$calls.number,
+        DS_cor[as.character(DS_unc$derivative.method)=='O(h^2)',]$calls.number,
+        DS_cor[as.character(DS_unc$derivative.method)=='O(h^4)',]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct O(h^2)", "correct O(h^4)", 
+                "incorrect O(h^2)", "incorrect O(h^4)"))
+#----------------------------------------------------------
+#
+#
+#----------------------------------------------------------
+# Stop criteria boxplots
+boxplot(DS_cor[as.character(DS_cor$criteria.of.stop)=='norm',]$calls.number,
+        DS_cor[as.character(DS_cor$criteria.of.stop)=='grad',]$calls.number,
+        DS_cor[as.character(DS_unc$criteria.of.stop)=='norm',]$calls.number,
+        DS_cor[as.character(DS_unc$criteria.of.stop)=='grad',]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct NORM", "correct GRAD", 
+                "incorrect NORM", "incorrect GRAD"))
+#----------------------------------------------------------
+#
+#
+#----------------------------------------------------------
+# Restarts presence
+boxplot(DS_cor[!DS_cor$restarts.presence,]$calls.number,
+        DS_cor[DS_cor$restarts.presence,]$calls.number,
+        DS_cor[!DS_unc$restarts.presence,]$calls.number,
+        DS_cor[DS_unc$restarts.presence,]$calls.number,
+        ylim=c(0,40000),
+        names=c("correct without\nrestarts", "correct with\nrestarts", 
+                "incorrect without\nrestarts", "incorrect with\nrestarts"))
+#----------------------------------------------------------
+#
+#
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+###########################################################
+#
+# Chosen subsample
+DS_opt <- DS_best[as.character(DS_best$criteria.of.stop)=="norm",]
+DS_opt <- DS_opt[DS_opt$restarts.presence,]
+
+# Deviding invalid, uncorrect and correct values
+DS_opt_inv <- DS_opt[is.na(DS_opt$x..1),]
+DS_opt_val <- DS_opt[!is.na(DS_opt$x..1),]
+DS_opt_unc <- DS_opt_val[DS_opt_val$accuracy<DS_opt_val$reached.accuracy,]
+DS_opt_cor <- DS_opt_val[DS_opt_val$accuracy >= DS_opt_val$reached.accuracy,]
+
+# Function calls number
+FCN_cor <- DS_opt_cor$calls.number
+# What the median and IQR of it?
+median(FCN_cor)
+IQR(FCN_cor)
